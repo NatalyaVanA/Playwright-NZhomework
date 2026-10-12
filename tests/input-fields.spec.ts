@@ -3,36 +3,30 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
 })
-// there was only one exsercise on the Input Fields Assigment page  
+// there was only one exsercise on the Input Fields Assigment page 
 test('Change first pet type', async ({ page }) => {
   await page.getByRole('link', { name: 'Pet Types' }).click();
-  await expect(page.locator('h2')).toHaveText('Pet Types');
-  
-  const firstPetTypeRow = page.locator('tr')
-    .filter({
-      has: page.locator('td')
-        .filter({ has: page.locator('[id="0"]') })
-    });
+  await expect(page.getByRole('heading')).toHaveText('Pet Types');
+
+  const firstPetTypeRow = page.locator('tr', { has: page.locator('[id="0"]') });
+
   await expect(firstPetTypeRow).toHaveCount(1);
   await firstPetTypeRow.getByRole('button', { name: 'Edit' }).click();
 
-  await expect(page.locator('h2')).toHaveText('Edit Pet Type');
-  const editTypeField = page.locator('#name');
-  await editTypeField.click();
+  await expect(page.getByRole('heading')).toHaveText('Edit Pet Type');
+  const editTypeField = page.getByRole('textbox');
+  await expect(editTypeField).toHaveValue('cat')
   await editTypeField.fill('rabbit');
+  await page.getByRole('button', { name: 'Update' }).click()
 
-  const updateButton = page.getByRole('button', { name: 'Update' });
-  await expect(updateButton).toHaveCount(1);
-  await updateButton.click();
-
-  await expect(page.locator('h2')).toHaveText('Pet Types');
-  const firstPetTypeValue = page.locator('[id="0"]');
-  await expect(firstPetTypeValue).toHaveValue('rabbit');
+  await expect(page.getByRole('heading')).toHaveText('Pet Types');
+  const firstPetTypeInputField = page.locator('[id="0"]');
+  await expect(firstPetTypeInputField).toHaveValue('rabbit');
 
   await firstPetTypeRow.getByRole('button', { name: 'Edit' }).click();
-  await editTypeField.click();
+  await expect(editTypeField).toHaveValue('rabbit')
   await editTypeField.fill('cat');
-  await updateButton.click();
-  await expect(firstPetTypeValue).toHaveValue('cat');
+  await page.getByRole('button', { name: 'Update' }).click()
+  await expect(firstPetTypeInputField).toHaveValue('cat');
 });
 
